@@ -88,6 +88,8 @@ memoryAccess.Unlock()
 
 Deadlocks, Livelocks, and Starvation
 
+Deadlock
+
 * Deadlock: All concurrent processes are waiting on one another. In this case, the program will never recover without outside intervention.
 * Goroutines can help with deadlock detection and recovery in some cases but not with deadlock prevention.
 
@@ -102,3 +104,26 @@ Deadlocks, Livelocks, and Starvation
 
 * If we can't any of the one condition, we can prevent deadlock.
 * In practice, it can be very hard to find.
+
+
+********************************************************************************
+
+Livelock
+* Programs which are actively performing concurrent operations but these programs do nothing to move the state of the program forward. 
+* We can also say that it is a scenario where 2 or more concurrent processes are trying to avoid deadlock with no coordination.
+* Eg. you are moving in a hallway and someone is coming from the front. You both keep on moving from one side to the other in order to make way for the other. HALLWAY SHUFFLE
+
+* You can go through the following sync packages:
+https://pkg.go.dev/sync#Cond => Cond => Condition variable => 
+    Broadcast method ==> wakes all goroutines waiting on c(*Cond).
+https://pkg.go.dev/sync#Locker ==> interface with Lock and Unlock method. Mutex, RWMutex implement it. 
+
+* Livelocks could be even harder to spot than deadlocks because it can appear that the program is doing work.
+* By looking a CPU utilization, you might think that it is doing work.
+* Using sync.Cond's Wait method, we ensure that both the process move at same speed.
+* Livelocks are a subset of a larger set of problems called "Starvation"
+
+********************************************************************************
+
+Starvation
+* When a concurrent process cannot get all the resources it needs to perform work.

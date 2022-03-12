@@ -24,6 +24,20 @@ Why Is Concurrency Hard?
 * Bad idea: Adding time.sleep to make parallel code predictable.
     * We have made our program inefficient + We have made our program probabilistic.
 
+1 var data int 
+2 go func() {
+3    data++
+4 }()
+5 if data == 0 {
+6     fmt.Printf("the value is %v.\n", data)
+7 }
+
+* nothing is print if 3 was executed before 5.
+* the values is 0 is printed if line 5 and 6 were executed before line 3.
+* the values is 1 is printed if line 5 was executed before line 3 but line 3 was executed before line 6.
+
+********************************************************************************
+
 2. Atomicity
 * Within the "context" that it is operating, it is indivisible or uninterruptable.
 * "Context" is important here because something may be atomic in one context but not in another.
@@ -35,10 +49,56 @@ Why Is Concurrency Hard?
     * Increment i
     * Store the value of i
 * While all 3 are atomic in an application context. When combined, they won't necessarily be atomic.
-* It the context is a program with no concurrent processes, then it will be concurrent.
-* It the context is a goroutine which doesn't expose i to other goroutines, then it is atomic.
+* If the context is a program with no concurrent processes, then it will be concurrent.
+* If the context is a goroutine which doesn't expose i to other goroutines, then it is atomic.
 
 * Why is atomicity important? If something is atomic, then it is safe with concurrent contexts.
 * It can even serve as way to optimize concurrent programs.
 * Most statement aren't atomic. Let alone functions, programs. How do we solve this? We can force atomicity by employing various techniques.
 * The art then becomes which area of your code need atomicity and at what granularity.
+
+********************************************************************************
+
+3. Memory Access Synchronization
+* Critical section: Name for the section of our program that needs exclusive access to a shared resource.
+* In race condition example, there are 3 CS: increment, check, print.
+* NOTE: Non idiomatic Go code. Not recommended way of doing it.
+
+var memoryAccess sync.Mutex 
+var data int 
+go func() {
+    memoryAccess.Lock()
+    data++
+    memoryAccess.Unlock()
+}()
+memoryAccess.Lock()
+if data == 0 {
+    fmt.Printf("the value is %v.\n", data)
+}
+memoryAccess.Unlock()
+
+* IMP: We haven't fully solved the issue if we want to execute the code in a certain order. This will only ensure that the 2 blocks have exclusive access but the order will be non-determinisitic. We'll learn later for the tools to solve issues of these kinds of problems.
+* We'll later see the performance implications of synchronizing access to memory.
+
+* Two tricky questions which should be answered on the basis of your code:
+    * What size should my critical sections be?
+    * Are my CS entered and exited repeatedly? 
+
+********************************************************************************
+
+Deadlocks, Livelocks, and Starvation
+
+* Deadlock: All concurrent processes are waiting on one another. In this case, the program will never recover without outside intervention.
+* Goroutines can help with deadlock detection and recovery in some cases but not with deadlock prevention.
+
+* In the race_condition/main.go example, the first goroutine has locked a and attempts to lock b. While the 2nd goroutine locks b and attempts to lock a. Both goroutines will wait infinitely on each other.
+
+* Coffman Condition:
+* Mutually exclusive: A concurrent process holds exclusive rights to a resource at any point in time.
+* Wait for condition: A concurrent process must hold a resource and be waiting on another resource.
+* No preemption: A resource held by a process can only be released by that process.
+* Circular Wait: A concurrent process(P1) must be waiting on a chain of other concurrent process P2, which are in turn waiting on it(P1). 
+
+
+* If we can't any of the one condition, we can prevent deadlock.
+* In practice, it can be very hard to find.

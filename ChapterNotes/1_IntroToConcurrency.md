@@ -127,3 +127,15 @@ https://pkg.go.dev/sync#Locker ==> interface with Lock and Unlock method. Mutex,
 
 Starvation
 * When a concurrent process cannot get all the resources it needs to perform work.
+* In case of livelock, each resource is starved for a shared lock. Livelock is a special starvation case in which all goroutines are starved equally and no work is accomplished.
+* Common scenario: There are greedy processes which are unfairly preventing some of the concurrent processes from accomplishing work as efficiently as possible, or any work at all.
+* In the starvation/main.go example, the greedy worker greedily holds on to the lock for the entirity of its work loop, whereas the polite work holds only when it needs to.
+* Here the greedy worker, it preventing the polite work to do its work optimally.
+
+* Detecting starvation requires logging metrics.
+* This can be detected by determinig if our rate of work is as high as expected.
+
+* Finding a balance: In case of memory access synchronization, we'll have to find a balance preferring coarse-grained synchronization for performance and fine-grained synchronization for fairness.
+
+* Going with fine-grained first is a much better way. We can always broaden the scope.
+* Starvation can also come out of go processes. It can come out of CPU, DB connections, file handles, memory, etc: any resource which must be shared is a candidate for starvation.

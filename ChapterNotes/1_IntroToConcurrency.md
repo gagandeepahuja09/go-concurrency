@@ -139,3 +139,32 @@ Starvation
 
 * Going with fine-grained first is a much better way. We can always broaden the scope.
 * Starvation can also come out of go processes. It can come out of CPU, DB connections, file handles, memory, etc: any resource which must be shared is a candidate for starvation.
+
+********************************************************************************
+
+Determining Concurrency Safety
+
+Common questions:
+* How to find the right level of abstraction for concurrent code?
+* Techniques to create a solution that is both easy to use and modify?
+* What is the right level of concurrency for this problem?
+
+* When going through existing code ==> Not always obvious what code is utilizing concurrency and how to utilize the code safely?
+
+    // CalculatePi calculates digits of Pi b/w the begin and end place.
+    func CalculatePi(begin, end int64, pi *Pi)
+
+* The above function raise a lot of questions:
+    * Am I responsible for instantiating multiple concurrent invocations of this function?
+    * All the functions are going to be using the instance of Pi whose address we pass in. Am I responsible for synchronizing the access to this memory of does the function take care of this?
+
+* Comments work wonders in such cases:  
+    // CalculatePi calculates digits of Pi b/w the begin and end place.
+    // Internally CalculatePi calls FLOOR((end - begin) / 2) concurrent processes 
+    // which recursively call CalculatePi. Synchronization to writes are handled internally by the Pi struct.
+
+* It answers important questions like: who is responsible for concurrency and who is responsible for synchronization.
+* We can change how we have modeled it. If we take a functional approach and ensure that our function has no side effects, we are removing questions related to synchronization.
+
+    func CalculatePi(begin, end int64) <-chan int
+

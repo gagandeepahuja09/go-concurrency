@@ -168,3 +168,26 @@ Common questions:
 
     func CalculatePi(begin, end int64) <-chan int
 
+********************************************************************************
+
+Simplicity in the face of complexity
+* With Go's concurrency primitives, you can more safely and clearly express your concurrent algorithms.
+
+* How do they make our life easier?
+1. Go's Concurrent, Low Latency Garbage Collector:
+    * Are they good to have?
+    * They prevent work in a problem domain which requires real-time performance or a deterministic performance profile.
+    * Pausing all activity in a program to clean up garbage isn't acceptable.
+    * Go 1.8 ==> takes only 10-100 microseconds.
+    * How does this help us? Memory management is a difficult problem to solve. Coupled with concurrency, it becomes even more difficult.
+    * Go ensures that you don't have to forcefully manage memory simply or across concurrent processes.
+
+2. Go's runtime automatically handles multiplexing concurrent operations onto operating system threads.(ABSTRACTION) It allows us to directly map concurrent problems into concurrent constructs instead of starting and managing threads and mapping logic evenly across threads.
+* In some languages, we would first need to create a thread pool(colln of threads).
+* Then map incoming conns to threads.
+* Within each thread loop over all connections to ensure that they all receive some CPU time.
+* The connection handling logic needs to be pausible so that it can be shared fairly with other connections.
+* The go runtime will handle all this automatically.
+
+3. Makes composing larger problems easy. Channel provides composable, concurrent safe way to communicate between processes.
+

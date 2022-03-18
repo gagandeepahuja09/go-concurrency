@@ -49,3 +49,25 @@ What Is CSP?
 * Most languages favor sharing and synchronizing access to the memory as compared to CSP's message passing style.
 * Memory sharing, synchronizing isn't bad. Sometime it is appropriate, even in Go.
 * However the shared memory can be difficult to utilize correctly - especially in large or complicated programs.
+
+********************************************************************************
+
+How does this help you?
+
+* The comparison b/w go and other languages is generally a comparison between a goroutine & a thread or a channel & a mutex.
+* Goroutines free us from having to think about our problem in terms of parallelism.
+* Example: building a web server. Setting aside language frameworks, in a language which only offers thread abstraction, we would have to think about the following points: 
+    * Does my language naturally support threads or will I have to pick a library?
+    * How heavy are threads in the operating system?
+    * How does the OS where my program will be running in handle threads differently?
+    * I should create a worker pool to constrain the number of threads I create. How do I find the optimal number?
+* All of these are important to consider but none of them directly concern the problem we're trying to solve.
+* All this is acheived in goroutines by a promise that Go makes us, that goroutines are lightweight, and we normally won't have to worry about creating one.
+* There a appropriate times to consider the # of running goroutines but doing this upfront is premature optimisation. In constrast to threads, where we would need to think about all this upfront.
+
+* This mapping also has a side-effect benefit for us. Go's runtime multiplexes goroutines onto OS threads for us and manages their scheduling for us. This means that optimizations to runtime can be made without having to change how we've modeled our problem.
+* As advancements in parallelism are made, Go's runtime will improve, as will the performance of your program, all for free.
+
+* Advantage 2: Since Go's runtime is managing the scheduling of goroutines for you, it can introspect on things like goroutines blocked waiting for I/O and intelligently reallocate OS threads to goroutines which are not blocked. This also increases the performance of our code.
+
+* Advantage 3: Because the problems we work on as developers are naturally concurrent more often than not, we'll be writing concurrent code at a finer level of granularity than we perhaps would in other languages. Eg. goroutine for every user, instead of multiplexed into a thread pool. This level of granularity helps to dynamically scale the amount of parallelism - Amdahl's law in action.

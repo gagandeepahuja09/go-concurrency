@@ -71,3 +71,44 @@ How does this help you?
 * Advantage 2: Since Go's runtime is managing the scheduling of goroutines for you, it can introspect on things like goroutines blocked waiting for I/O and intelligently reallocate OS threads to goroutines which are not blocked. This also increases the performance of our code.
 
 * Advantage 3: Because the problems we work on as developers are naturally concurrent more often than not, we'll be writing concurrent code at a finer level of granularity than we perhaps would in other languages. Eg. goroutine for every user, instead of multiplexed into a thread pool. This level of granularity helps to dynamically scale the amount of parallelism - Amdahl's law in action.
+
+********************************************************************************
+
+Go's philosophy on Concurrency
+* Go also supports more traditional means of writing concurrent code. Sync and other package allow us to perform locks, create pool of resources, preempt goroutines, and more.
+* We have control over the style but that can also be confusing on which style to choose.
+* As per go doc => Other than Once and Waitgroups, most are intended for use by library Goroutines. Higher level synchronization is better done via channels and communication.
+* Famous line in the go community => "Do not communicate by sharing memory. Share memory by communicating".
+* The way we can choose(shared memory vs msg passing) comes generally from where we're trying to manage our concurrency: internally to a tight scope or externally throughout our system. 
+
+Questions to ask:
+1. Are you trying to transfer ownership of data?
+    * When a bit of code wants to share the result with another bit of code.
+    * Channels help in communicating this concept by encoding that intent in the channel's type. 
+    * We can create buffered channels to implement a cheap in-memory queue and thus decouple our producer from consumer.
+    * By using channels, we have implicitly made our concurrent code composable with other concurrent code.
+
+
+2. Are you trying to guard internal state of a struct?
+    * Great candidate for memory access synchronization.
+    * You may want to hide the implementation details of locking your critical section from your caller. 
+    * Try to keep the locks constrained to a small lexical scope. Example: 
+
+        type Counter struct {
+            mu sync.Mutex
+            value int
+        }
+
+        func (c *counter) Increment() {
+            c.mu.Lock()
+            defer c.mu.Unlock()
+            c.value++
+        }
+
+3. Are you trying to coordinate multiple pieces of data?
+    * Channels are inherently more composable than memory access synchronization primitives.
+    * Having locks scattered throughout the object-graph sounds like a nightmare.
+    * I can compose channels but I can't compose locks or methods which return values.
+
+4. Is it a performance critical section?
+    * Channels use memory access synchronization to operate, hence can be slower. 

@@ -7,3 +7,10 @@ Key Requirement for Channels:
 * All the execution stages as well as the generator run concurrently(each have a go routine and a for select inside the goroutine) so that they don't have to wait for one execution stage to complete in order for the other to start.
 
 * done channel is used in each method for prevent goroutine leaks.
+
+***************************************************************************************
+
+Repeat Take Pattern in Pipelines
+* Repeat take both are generators.
+* Repeat will infinitely keep on sending the values of the interface in a cycle.
+* Take will only ready the first num values from the channel. 

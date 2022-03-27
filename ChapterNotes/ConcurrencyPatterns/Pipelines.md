@@ -18,3 +18,11 @@ Repeat Take Pattern in Pipelines
 * It is OK to use interface{} as types for channels so that we can use them as a standard library of pipeline patterns.
 
 * When we want to deal with specific type, we can add stages with type assertions. The performance overhead for adding an extra stage is negligible.
+
+************************************************************************************
+
+Possible Performance Issues In Pipeline
+* The limiting factor on the pipeline will either be the generator or one of the stages which is computationally intensive.
+* Generators are generally I/O bound. Reading from disk or network will be computationally expensive in such cases.
+
+How can we mitigate the issue of one computationally expensive stage rate-limiting the entire pipeline. ==> Fanout, Fanin pattern can help there.

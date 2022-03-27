@@ -13,4 +13,8 @@ Key Requirement for Channels:
 Repeat Take Pattern in Pipelines
 * Repeat take both are generators.
 * Repeat will infinitely keep on sending the values of the interface in a cycle.
-* Take will only ready the first num values from the channel. 
+* Take will only ready the first num values from the channel.
+
+* It is OK to use interface{} as types for channels so that we can use them as a standard library of pipeline patterns.
+
+* When we want to deal with specific type, we can add stages with type assertions. The performance overhead for adding an extra stage is negligible.

@@ -13,3 +13,10 @@ Options which are implicitly safe within multiple concurrent operations:
 * Ad-hoc: Convention set by a community, hence high chances of anything going wrong. We'll need to do some static-analytics on our code every time someone commits some code. This is very difficult to manage within teams.
 
 * Lexical: Compiler enforces the confinement. Eg. read-only and write-only channels.
+
+* Channels are an easier example since they are concurrent-safe. Next example is for bytes.Buffer, a non concurrent-safe data structure.
+* Because of the lexical scope, we have made it impossible to do the wrong thing.
+
+* Why pursue confinement if we have synchronization available to us?
+    * Improved performance and reduced cognitive load on devs.
+    * Concurrent code which utilizes lexical confinement has the benefit of being simpler to understand.

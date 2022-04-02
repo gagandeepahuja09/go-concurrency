@@ -15,5 +15,5 @@ type Context interface {
 
 	Err() error
 
-	Value()
+	Value(key interface{}) interface{}
 }

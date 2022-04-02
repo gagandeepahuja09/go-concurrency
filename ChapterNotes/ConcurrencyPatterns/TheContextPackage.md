@@ -21,3 +21,19 @@
 
 * Instances of Context may look similar but may change at every stack-frame.
 * For this reason, it's important to always pass instances of Context into our functions.
+
+* In the done channel example of context, we can see that we are creating two branches of our program running concurrently.
+* If we close the done channel at any point in main, both branches will be canceled.
+* The good thing is that we pass a read only channel to the children goroutines, hence they cannot close it.
+
+
+* Using context it is very trivial to implement scenarios like the following:
+    * If printGreeting is unsuccessful, we also want to cancel our call to printFarewell.
+    * We want genGreeting to timeout after 1 second.
+
+* OUTPUT:
+    cannot print greeting: context deadline exceeded
+    cannot print farewell: context canceled
+
+* First one is due to timeout. Second is due to cancel.
+* As per the error handling strategy, the error will be returned and bubbled up for the main goroutine to handle it.

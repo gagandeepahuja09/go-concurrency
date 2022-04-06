@@ -43,7 +43,7 @@ func main() {
 				}
 			}
 
-			for {
+			for i := 0; i < 2; i++ {
 				select {
 				case <-done:
 					return
@@ -78,6 +78,7 @@ func main() {
 			}
 			fmt.Printf("result %v\n", r.Second())
 		case <-time.After(timeout):
+			fmt.Printf("worker goroutine is not healthy")
 			return
 		}
 	}
